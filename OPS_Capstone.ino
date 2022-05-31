@@ -18,7 +18,7 @@ double Kp = 0.5;
 double Ki = 0;
 double Kd = 2;
 double curr_error, int_error, der_error;
-double target_reading = 1000;
+double target_reading = 700;
 double duration;
 long ir_zero, ir_reading;
 
@@ -111,8 +111,7 @@ void loop() {
 
   int spd = PID(duration);
 
-  //Serial.println(spd);
-
+  //unsure of how to use PID number since there are two motors
   if(spd > 0)  //turn left
   {
   current_speed_L = constrain(spd, MIN_SPEED_L + 20, 255);
@@ -124,19 +123,15 @@ void loop() {
   current_speed_L = current_speed_R + 19;
   if (current_speed_L > 255) current_speed_L = 255;
   }
-
-  //Serial.print(current_speed_L);
-  //Serial.print(", ");
-  //Serial.println(current_speed_R);
   
   analogWrite(EN1, current_speed_L);
   analogWrite(EN2, current_speed_R);
 
-   //if (ir_reading < ir_zero - 50) stop();
+   //if (ir_reading < ir_zero - 50) stop();  //temporary
 
 }
 
-double read_ultra(){
+double read_ultra(){   //reads ultrasound duration as an average of 10 pulses
   double dur = 0;
 
   // average over 10 reads
@@ -153,11 +148,11 @@ double read_ultra(){
   return dur;
 }
 
-double PID(double dur)
+double PID(double dur)  //calculates PID
 {
   int time_elapsed = millis();
   int prev_error = curr_error;
-  curr_error = 700 - dur;
+  curr_error = target_reading - dur;
   int_error += time_elapsed * curr_error;
   der_error = (curr_error - prev_error) / time_elapsed;
 
